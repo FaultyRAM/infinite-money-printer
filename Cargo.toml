@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 [workspace]
-members = ["core"]
+members = ["core", "native"]
 resolver = "2"
 
 [profile.release]

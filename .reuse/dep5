@@ -3,8 +3,6 @@ Upstream-Name: infinite-money-printer
 Upstream-Contact: FaultyRAM <316014+FaultyRAM@users.noreply.github.com>
 Source: https://github.com/FaultyRAM/infinite-money-printer
 
-# Sample paragraph, commented out:
-#
-# Files: src/*
-# Copyright: $YEAR $NAME <$CONTACT>
-# License: ...
+Files: native/icons/*
+Copyright: 2019-2024, The Tauri Programme in the Commons Conservancy
+License: Apache-2.0 OR MIT
