@@ -1,0 +1,69 @@
+// SPDX-FileCopyrightText: 2024 FaultyRAM <316014+FaultyRAM@users.noreply.github.com>
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+= Infinite Money Printer
+
+_Infinite Money Printer_ is a free, open-source, web-based incremental game.
+
+== Build Instructions
+
+=== Setup
+
+. Install https://www.rust-lang.org[Rust] (we recommend using rustup to manage
+  Rust toolchains; the following instructions assume you are using rustup).
+
+. Install the standard Rust libraries for the `wasm32-unknown-unknown` target:
+
+    rustup target add wasm32-unknown-unknown
+
+. Install the `wasm-bindgen-cli` crate, which is used to generate bindings
+  between Rust (WebAssembly) and JavaScript:
+
+    cargo install wasm-bindgen-cli
+
+=== Compilation
+
+. From within the root source directory, invoke Cargo to build the
+  `infinite-money-printer-core` crate:
+
+    cargo build -p infinite-money-printer-core --target wasm32-unknown-unknown
+
+. Invoke `wasm-bindgen-cli` to generate the Rust <--> JavaScript bindings:
+
+    wasm-bindgen --out-dir ./pkg --target web --split-linked-modules --reference-types ./target/wasm32-unknown-unknown/debug/infinite_money_printer_core.wasm
+
+Note that `cargo build` defaults to debug builds. For release builds, you'll
+need to append `--release` to the `cargo build` command and point
+`wasm-bindgen-cli` to the corresponding WebAssembly module:
+
+    cargo build -p infinite-money-printer-core --target wasm32-unknown-unknown
+    wasm-bindgen --out-dir ./pkg --target web --split-linked-modules --reference-types ./target/wasm32-unknown-unknown/release/infinite_money_printer_core.wasm
+
+=== Native App
+
+_Infinite Money Printer_ is designed to run in either a web browser, or a native
+app via https://tauri.app[Tauri]. The above instructions apply to both
+situations, but the latter requires some extra steps:
+
+. If you are cross-compiling the native app, install the standard Rust libraries
+  for each desired target:
+
+    rustup target add <triple>
+
+. Install the `tauri-cli` crate, which is used to pack and compile the native
+  app:
+
+    cargo install tauri-cli
+
+. After compiling the WebAssembly modules (see <<Compilation>> above), invoke
+  `tauri-cli` to compile the native app.
+
+.. You can test the native app locally before generating a release build:
+
+    cargo tauri dev
+
+.. Once you're ready, use `tauri-cli` to generate the release build (append
+   `--target <triple>` if cross-compiling):
+
+    cargo tauri build
