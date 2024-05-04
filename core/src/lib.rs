@@ -20,7 +20,7 @@ impl Core {
         Self { world, schedule }
     }
 
-    pub fn update(&mut self) {
+    pub fn update(&mut self, _delta: f64) {
         self.schedule.run(&mut self.world);
     }
 }

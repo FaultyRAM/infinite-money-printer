@@ -17,15 +17,13 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <script type="module">
         import init_core, { Core } from './infinite_money_printer_core.js';
 
-        async function run() {
-            await init_core();
-            let core_obj = new Core();
-            while (true) {
-                core_obj.update();
-            }
+        await init_core();
+        const core_obj = new Core();
+        function update(delta) {
+            core_obj.update(delta);
+            window.requestAnimationFrame(update);
         }
-
-        run();
+        window.requestAnimationFrame(update);
     </script>
     <h1>Infinite Money Printer</h1>
 </body>
