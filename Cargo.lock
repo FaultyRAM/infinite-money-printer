@@ -1568,15 +1568,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "infinite-money-printer-core"
-version = "0.1.0"
-dependencies = [
- "bevy_ecs",
- "wasm-bindgen",
-]
-
-[[package]]
-name = "infinite-money-printer-native"
+name = "infinite-money-printer"
 version = "0.1.0"
 dependencies = [
  "serde",
@@ -1584,6 +1576,14 @@ dependencies = [
  "tauri",
  "tauri-build",
  "tauri-plugin-shell",
+]
+
+[[package]]
+name = "infinite-money-printer-core"
+version = "0.1.0"
+dependencies = [
+ "bevy_ecs",
+ "wasm-bindgen",
 ]
 
 [[package]]
