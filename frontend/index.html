@@ -19,8 +19,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
         await init_core();
         const core_obj = new Core();
-        function update(delta) {
-            core_obj.update(delta);
+        function update(timestamp) {
+            core_obj.update(timestamp);
             window.requestAnimationFrame(update);
         }
         window.requestAnimationFrame(update);
