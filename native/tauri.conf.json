@@ -17,7 +17,7 @@
       }
     ],
     "security": {
-      "csp": "default-src 'self'; script-src 'self' 'unsafe-eval'"
+      "csp": "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'"
     }
   },
   "bundle": {
