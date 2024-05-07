@@ -13,8 +13,20 @@ version = "^0.13.0"
 default-features = false
 features = ["multi-threaded"]
 
+[dependencies.bigdecimal]
+version = "^0.4.0"
+
 [dependencies.wasm-bindgen]
 version = "^0.2.0"
+
+[dependencies.web-sys]
+version = "^0.3.0"
+features = [
+    "Document",
+    "Element",
+    "Node",
+    "Window",
+]
 
 [lib]
 crate-type = ["cdylib"]

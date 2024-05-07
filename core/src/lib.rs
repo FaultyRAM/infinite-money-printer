@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+mod credits;
 mod game_state;
+mod ui;
 
 pub use game_state::GameState;

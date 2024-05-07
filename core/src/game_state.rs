@@ -2,7 +2,12 @@
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+use crate::{
+    credits::{update_credits, Credits},
+    ui::update_ui,
+};
 use bevy_ecs::prelude::*;
+use bigdecimal::BigDecimal;
 use wasm_bindgen::prelude::*;
 
 #[derive(Clone, Copy, Debug, Resource)]
@@ -22,11 +27,13 @@ impl GameState {
     #[wasm_bindgen(constructor)]
     pub fn new(timestamp: f64) -> Self {
         let mut world = World::new();
-        let schedule = Schedule::default();
+        let mut schedule = Schedule::default();
         world.insert_resource(UpdateInterval {
             timestamp,
             delta: 0f64,
         });
+        world.insert_resource(Credits(BigDecimal::from(0)));
+        schedule.add_systems((update_credits, update_ui).chain());
         Self { world, schedule }
     }
 
