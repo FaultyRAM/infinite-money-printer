@@ -1,0 +1,30 @@
+# SPDX-FileCopyrightText: 2024 FaultyRAM <316014+FaultyRAM@users.noreply.github.com>
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+name: 'Run Boilerplate Tasks'
+description: 'Perform standard tasks required across multiple jobs.'
+runs:
+  using: composite
+  steps:
+    - if: ${{ runner.os == 'Linux' }}
+      uses: awalsh128/cache-apt-pkgs-action@latest
+      with:
+        packages: |
+          curl
+          wget
+          file
+          libssl-dev
+          libwebkit2gtk-4.1-dev
+          libayatana-appindicator3-dev
+          librsvg2-dev
+        version: 1.0
+    - if: ${{ runner.os == 'macOS' }}
+      id: check-extra-targets
+      shell: bash
+      run: echo "extra-targets=aarch64-apple-darwin x86_64-apple-darwin" >> $GITHUB_OUTPUT
+    - uses: ./.github/actions/rust-toolchain
+      with:
+        toolchain: stable
+        extra-targets: wasm32-unknown-unknown ${{ steps.check-extra-targets.outputs.extra-targets }}
+        components: clippy rustfmt

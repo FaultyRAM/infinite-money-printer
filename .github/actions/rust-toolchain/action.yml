@@ -1,0 +1,74 @@
+# SPDX-FileCopyrightText: 2024 FaultyRAM <316014+FaultyRAM@users.noreply.github.com>
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+name: 'Install Rust Toolchain'
+description: 'Install a Rust toolchain.'
+inputs:
+  toolchain:
+    description: 'The Rust toolchain to install. Passed as the `toolchain` argument to `rustup toolchain install`.'
+    type: string
+    required: true
+  extra-targets:
+    description: 'A space-delimited list of additional targets to configure for this toolchain.'
+    type: string
+    required: false
+    default: ''
+  components:
+    description: 'A space-delimited list of additional components to install for this toolchain.'
+    type: string
+    required: false
+    default: ''
+  enable-caching:
+    description: 'Whether to cache this toolchain. Enabled by default.'
+    type: boolean
+    required: false
+    default: true
+runs:
+  using: composite
+  steps:
+    - name: 'Install coreutils'
+      if: ${{ runner.os == 'macOS' }}
+      shell: bash
+      run: brew install coreutils
+    - name: 'Generate cache key'
+      id: generate-cache-key
+      if: ${{ inputs.enable-caching }}
+      shell: bash
+      run: |
+        toolchain_regex='^(stable|beta|nightly|[0-9]+\.[0-9]+|[0-9]+\.[0-9]+\.[0-9]+)(-([0-9]{4}-[0-9]{2}-[0-9]{2}))?(-(.+))?$'
+        channel=$(echo ${{ inputs.toolchain }} | sed -Ene "s/$toolchain_regex/\1/p")
+        date=$(echo ${{ inputs.toolchain }} | sed -Ene "s/$toolchain_regex/\3/p")
+        host=$(echo ${{ inputs.toolchain }} | sed -Ene "s/$toolchain_regex/\5/p")
+        hash_url=$(echo https://static.rust-lang.org/dist$(if [[ -n $date ]]; then echo /$date; fi)/channel-rust-$channel-git-commit-hash.txt)
+        hash_sig=$(mktemp)
+        hash_txt=$(mktemp)
+        curl -o $hash_sig $hash_url.asc
+        curl -o $hash_txt $hash_url
+        gpg --import ./.github/actions/rust-toolchain/rust-key.gpg.ascii
+        gpg --verify $hash_sig $hash_txt
+        key_suffix=$(echo ${{ inputs.extra-targets }} ${{ inputs.components }} | sha256sum | head -c9)
+        echo "key=rust-${{ inputs.toolchain }}-${{ runner.os }}_${{ runner.arch }}-$(cat $hash_txt | head -c9)-$key_suffix" >> $GITHUB_OUTPUT
+    - name: 'Restore cached toolchain'
+      id: restore-toolchain
+      if: ${{ inputs.enable-caching }}
+      uses: actions/cache/restore@v4
+      with:
+        path: |
+          ~/.cargo
+          ~/.rustup
+        key: ${{ steps.generate-cache-key.outputs.key }}
+    - name: 'Install Rust toolchain'
+      if: ${{ !(inputs.enable-caching && steps.restore-toolchain.outputs.cache-hit) }}
+      shell: bash
+      run: |
+        rustup toolchain install --profile minimal -c ${{ inputs.components }} -t ${{ inputs.extra-targets }} --no-self-update ${{ inputs.toolchain }}
+        rustup default ${{ inputs.toolchain }}
+    - name: 'Cache Rust toolchain'
+      if: ${{ inputs.enable-caching && !steps.restore-toolchain.outputs.cache-hit }}
+      uses: actions/cache/save@v4
+      with:
+        path: |
+          ~/.cargo
+          ~/.rustup
+        key: ${{ steps.generate-cache-key.outputs.key }}

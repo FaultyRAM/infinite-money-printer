@@ -1,0 +1,92 @@
+# SPDX-FileCopyrightText: 2024 FaultyRAM <316014+FaultyRAM@users.noreply.github.com>
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+name: 'Run Build Checks'
+on: [push, pull_request]
+env:
+  CARGO_INCREMENTAL: 0
+  CARGO_TERM_COLOR: always
+jobs:
+  populate-caches:
+    name: 'Populate Caches'
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/boilerplate
+  check-formatting:
+    name: 'Check Formatting'
+    needs: populate-caches
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/boilerplate
+      - run: cargo fmt --all --check
+  run-unit-tests:
+    name: "Run Unit Tests"
+    needs: populate-caches
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/boilerplate
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo test -p infinite-money-printer-core
+  build-core:
+    name: 'Build Core'
+    needs: populate-caches
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/boilerplate
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo install wasm-bindgen-cli
+      - run: cargo build -p infinite-money-printer-core --target=wasm32-unknown-unknown
+      - run: wasm-bindgen --out-dir ./pkg --target web --debug --keep-debug --split-linked-modules --reference-types ./target/wasm32-unknown-unknown/debug/infinite_money_printer_core.wasm
+      - uses: actions/upload-artifact@v4
+        with:
+          name: infinite-money-printer-core
+          path: ./pkg
+          if-no-files-found: error
+          compression-level: 9
+          overwrite: true
+  run-lints:
+    name: 'Run Lints'
+    needs: build-core
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/boilerplate
+      - uses: Swatinem/rust-cache@v2
+      - uses: actions/download-artifact@v4
+        with:
+          name: infinite-money-printer-core
+          path: ./pkg
+      - run: cargo clippy --all-targets --profile=test
+  build-native-app:
+    name: "Build Native App"
+    needs: build-core
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - host: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+          - host: windows-latest
+            target: x86_64-pc-windows-msvc
+          - host: macos-latest
+            target: universal-apple-darwin
+    runs-on: ${{ matrix.config.host }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/boilerplate
+      - uses: Swatinem/rust-cache@v2
+      - uses: actions/download-artifact@v4
+        with:
+          name: infinite-money-printer-core
+          path: ./pkg
+      - run: cargo install tauri-cli@"^2.0.0-beta"
+      - run: cargo tauri build -t ${{ matrix.config.target }} --debug --no-bundle

@@ -3,6 +3,10 @@ Upstream-Name: infinite-money-printer
 Upstream-Contact: FaultyRAM <316014+FaultyRAM@users.noreply.github.com>
 Source: https://github.com/FaultyRAM/infinite-money-printer
 
+Files: .github/actions/rust-toolchain/rust-key.gpg.ascii
+Copyright: The Rust Developers
+License: Apache-2.0 OR MIT
+
 Files: native/icons/*
 Copyright: 2019-2024, The Tauri Programme in the Commons Conservancy
 License: Apache-2.0 OR MIT
