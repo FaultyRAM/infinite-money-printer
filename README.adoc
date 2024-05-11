@@ -34,10 +34,10 @@ _Infinite Money Printer_ is a free, open-source, web-based incremental game.
     wasm-bindgen --out-dir ./pkg --target web --split-linked-modules --reference-types ./target/wasm32-unknown-unknown/debug/infinite_money_printer_core.wasm
 
 Note that `cargo build` defaults to debug builds. For release builds, you'll
-need to append `--release` to the `cargo build` command and point
+need to add `--release` to the `cargo build` command and point
 `wasm-bindgen-cli` to the corresponding WebAssembly module:
 
-    cargo build -p infinite-money-printer-core --target wasm32-unknown-unknown
+    cargo build --release -p infinite-money-printer-core --target wasm32-unknown-unknown
     wasm-bindgen --out-dir ./pkg --target web --split-linked-modules --reference-types ./target/wasm32-unknown-unknown/release/infinite_money_printer_core.wasm
 
 === Native App
@@ -54,7 +54,7 @@ situations, but the latter requires some extra steps:
 . Install the `tauri-cli` crate, which is used to pack and compile the native
   app:
 
-    cargo install tauri-cli
+    cargo install tauri-cli@"^2.0.0-beta"
 
 . After compiling the WebAssembly modules (see <<Compilation>> above), invoke
   `tauri-cli` to compile the native app.
