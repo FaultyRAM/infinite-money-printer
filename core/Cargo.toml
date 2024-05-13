@@ -24,9 +24,9 @@ version = "^0.3.0"
 features = [
     "AnimationTimeline",
     "Document",
+    "DocumentTimeline",
     "Element",
     "Node",
-    "DocumentTimeline",
     "Window",
 ]
 

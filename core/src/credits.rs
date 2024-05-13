@@ -4,7 +4,8 @@
 
 use crate::timing::UpdateInterval;
 use bevy_ecs::prelude::*;
-use bigdecimal::BigDecimal;
+use bigdecimal::{BigDecimal, RoundingMode};
+use std::fmt::{self, Display, Formatter};
 
 #[derive(Clone, Debug, Resource)]
 pub struct Credits(pub BigDecimal);
@@ -12,6 +13,12 @@ pub struct Credits(pub BigDecimal);
 impl Credits {
     pub fn new() -> Self {
         Self(BigDecimal::from(0))
+    }
+}
+
+impl Display for Credits {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        Display::fmt(&self.0.with_scale_round(0, RoundingMode::Floor), f)
     }
 }
 
