@@ -17,11 +17,19 @@ SPDX-License-Identifier: GPL-3.0-or-later
     <noscript>
         <h1>JavaScript is unavailable</h1>
         <p>
-            If you're seeing this message, it means that JavaScript is blocked and/or disabled in
-            your web browser. <em>Infinite Money Printer</em> uses JavaScript and can't run without
-            it. Please ensure that JavaScript is unblocked and enabled in your web browser, then
-            reload this web page.
+            If you're seeing this message, it means that <i>Infinite Money Printer</i> is currently
+            blocked from using JavaScript. Unfortunately, this game is implemented in JavaScript and
+            WebAssembly, and can't work if these are blocked. In order to play, you'll need to do
+            one or more of the following:
         </p>
+        <ul>
+            <li>Add a JavaScript exception for <i>Infinite Money Printer</i>;</li>
+            <li>Enable JavaScript in your web browser;</li>
+            <li>
+                Use a different web browser that supports both JavaScript and WebAssembly (all major
+                web browsers do so by default).
+            </li>
+        </ul>
     </noscript>
     <script type="module">
         import init_core, * as core from './infinite_money_printer_core.js';
