@@ -32,16 +32,9 @@ SPDX-License-Identifier: GPL-3.0-or-later
         </ul>
     </noscript>
     <script type="module">
-        import init_core, * as core from './infinite_money_printer_core.js';
+        import init_core from './infinite_money_printer_core.js';
 
         await init_core();
-
-        const game_state = new core.GameState(document.timeline.currentTime);
-        function update(timestamp) {
-            game_state.update(timestamp);
-            window.requestAnimationFrame(update);
-        }
-        window.requestAnimationFrame(update);
     </script>
     <span id="ui-credits"></span> credits
 </body>
