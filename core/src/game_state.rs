@@ -4,7 +4,7 @@
 
 use crate::{
     credits::{update_credits, Credits},
-    timing::UpdateInterval,
+    time::{Real, Time, Timestamp},
     ui::update_ui,
 };
 use bevy_ecs::prelude::*;
@@ -16,18 +16,19 @@ pub struct GameState {
 }
 
 impl GameState {
-    pub fn new(timestamp: f64) -> Self {
+    pub fn new() -> Self {
         let mut world = World::new();
         let mut schedule = Schedule::default();
-        world.insert_resource(UpdateInterval::new(timestamp));
+        let timestamp = Timestamp::now();
+        world.insert_resource::<Time<Real>>(Time::at(timestamp));
         world.insert_resource(Credits::new());
         schedule.add_systems((update_credits, update_ui).chain());
         Self { world, schedule }
     }
 
     pub fn update(&mut self, timestamp: f64) {
-        let mut update_interval: Mut<UpdateInterval> = self.world.resource_mut();
-        *update_interval = update_interval.advance(timestamp);
+        let mut real_time: Mut<Time<Real>> = self.world.resource_mut();
+        real_time.advance_to(Timestamp::at(timestamp));
         self.schedule.run(&mut self.world);
     }
 }

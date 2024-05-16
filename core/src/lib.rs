@@ -4,7 +4,7 @@
 
 mod credits;
 mod game_state;
-mod timing;
+mod time;
 mod ui;
 
 use game_state::GameState;
@@ -26,13 +26,7 @@ fn request_animation_frame(f: &Closure<dyn Fn(f64)>) {
 
 #[wasm_bindgen(start)]
 fn run() {
-    let timestamp = web_sys::window()
-        .and_then(|window| window.document())
-        .and_then(|document| document.timeline().current_time())
-        .unwrap();
-    GAME_STATE
-        .set(Mutex::new(GameState::new(timestamp)))
-        .unwrap();
+    GAME_STATE.set(Mutex::new(GameState::new())).unwrap();
     let update_cb = Rc::new(RefCell::new(None));
     let ucb_clone = update_cb.clone();
     *ucb_clone.borrow_mut() = Some(Closure::new(move |timestamp| {

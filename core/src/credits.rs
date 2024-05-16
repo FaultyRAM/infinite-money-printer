@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-use crate::timing::UpdateInterval;
+use crate::time::{Real, Time};
 use bevy_ecs::prelude::*;
 use bigdecimal::{BigDecimal, RoundingMode};
 use std::fmt::{self, Display, Formatter};
@@ -22,8 +22,8 @@ impl Display for Credits {
     }
 }
 
-pub fn update_credits(interval: Res<UpdateInterval>, mut credits: ResMut<Credits>) {
+pub fn update_credits(real_time: Res<Time<Real>>, mut credits: ResMut<Credits>) {
     let base_production_rate = BigDecimal::from(1);
-    let delta = BigDecimal::try_from(interval.delta() / 1000.0).unwrap();
+    let delta = BigDecimal::try_from(real_time.delta().as_secs_f64()).unwrap();
     credits.0 += base_production_rate * delta;
 }
