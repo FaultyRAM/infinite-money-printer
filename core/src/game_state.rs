@@ -16,19 +16,18 @@ pub struct GameState {
 }
 
 impl GameState {
-    pub fn new() -> Self {
+    pub fn new(timestamp: Timestamp) -> Self {
         let mut world = World::new();
         let mut schedule = Schedule::default();
-        let timestamp = Timestamp::now();
         world.insert_resource::<Time<Real>>(Time::at(timestamp));
         world.insert_resource(Credits::new());
         schedule.add_systems((update_credits, update_ui).chain());
         Self { world, schedule }
     }
 
-    pub fn update(&mut self, timestamp: f64) {
+    pub fn update(&mut self, timestamp: Timestamp) {
         let mut real_time: Mut<Time<Real>> = self.world.resource_mut();
-        real_time.advance_to(Timestamp::at(timestamp));
+        real_time.advance_to(timestamp);
         self.schedule.run(&mut self.world);
     }
 }

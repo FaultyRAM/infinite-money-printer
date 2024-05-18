@@ -8,30 +8,28 @@ mod time;
 mod ui;
 
 use game_state::GameState;
-use std::{
-    cell::RefCell,
-    rc::Rc,
-    sync::{Mutex, OnceLock},
-};
+use std::sync::{Mutex, OnceLock};
+use time::Timestamp;
 use wasm_bindgen::prelude::*;
 
 static GAME_STATE: OnceLock<Mutex<GameState>> = OnceLock::new();
 
-fn request_animation_frame(f: &Closure<dyn Fn(f64)>) {
+fn request_animation_frame(f: impl 'static + Fn(f64)) {
+    let update_cb: Closure<dyn Fn(f64)> = Closure::new(f);
     let window = web_sys::window().unwrap();
     let _ = window
-        .request_animation_frame(f.as_ref().unchecked_ref())
+        .request_animation_frame(update_cb.into_js_value().unchecked_ref())
         .unwrap();
+}
+
+fn update(timestamp: f64) {
+    let timestamp = Timestamp::at(timestamp);
+    let game_state = GAME_STATE.get_or_init(|| Mutex::new(GameState::new(timestamp)));
+    game_state.lock().unwrap().update(timestamp);
+    request_animation_frame(update);
 }
 
 #[wasm_bindgen(start)]
 fn run() {
-    GAME_STATE.set(Mutex::new(GameState::new())).unwrap();
-    let update_cb = Rc::new(RefCell::new(None));
-    let ucb_clone = update_cb.clone();
-    *ucb_clone.borrow_mut() = Some(Closure::new(move |timestamp| {
-        GAME_STATE.get().unwrap().lock().unwrap().update(timestamp);
-        request_animation_frame(update_cb.borrow().as_ref().unwrap());
-    }));
-    request_animation_frame(ucb_clone.borrow().as_ref().unwrap());
+    request_animation_frame(update);
 }
