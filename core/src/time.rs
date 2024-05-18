@@ -74,3 +74,83 @@ impl Time<Real> {
         self.timestamp = timestamp;
     }
 }
+
+#[derive(Clone, Copy, Debug)]
+pub struct Stopwatch {
+    elapsed: Duration,
+    enabled: bool,
+}
+
+impl Stopwatch {
+    pub const fn new() -> Self {
+        Self {
+            elapsed: Duration::ZERO,
+            enabled: true,
+        }
+    }
+
+    pub const fn elapsed(&self) -> Duration {
+        self.elapsed
+    }
+
+    pub const fn enabled(&self) -> bool {
+        self.enabled
+    }
+
+    pub fn set_enabled(&mut self, enabled: bool) {
+        self.enabled = enabled;
+    }
+
+    pub fn advance_by(&mut self, delta: Duration) {
+        self.elapsed += delta * (self.enabled as _);
+    }
+}
+
+impl Default for Stopwatch {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Clone, Copy, Debug)]
+pub struct OneShotTimer {
+    stopwatch: Stopwatch,
+    deadline: Duration,
+}
+
+impl OneShotTimer {
+    pub const fn new(deadline: Duration) -> Self {
+        Self {
+            stopwatch: Stopwatch::new(),
+            deadline,
+        }
+    }
+
+    pub const fn elapsed(&self) -> Duration {
+        self.stopwatch.elapsed()
+    }
+
+    pub const fn enabled(&self) -> bool {
+        self.stopwatch.enabled()
+    }
+
+    pub const fn deadline(&self) -> Duration {
+        self.deadline
+    }
+
+    pub fn is_running(&self) -> bool {
+        self.enabled() && !self.expired()
+    }
+
+    pub fn expired(&self) -> bool {
+        self.stopwatch.elapsed() >= self.deadline
+    }
+
+    pub fn set_enabled(&mut self, enabled: bool) {
+        self.stopwatch.set_enabled(enabled);
+    }
+
+    pub fn advance_by(&mut self, delta: Duration) {
+        self.stopwatch.advance_by(delta * ((!self.expired()) as _));
+    }
+}

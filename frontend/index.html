@@ -37,8 +37,13 @@ SPDX-License-Identifier: GPL-3.0-or-later
     await init_core();
   </script>
   <main id="ui-main" hidden>
-    <span id="ui-credits-display">
-      <span id="ui-credits">0</span> credits
-    </span>
+    <dl id="ui-resources-region">
+      <dt>Credits</dt>
+      <dd id="ui-credits">0</dd>
+    </dl>
+    <div id="ui-page1">
+      <progress id="ui-print-progress"></progress>
+      <button id="ui-print-money">Print money</button>
+    </div>
   </main>
 </body>

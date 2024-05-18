@@ -26,6 +26,8 @@ features = [
     "Document",
     "DocumentTimeline",
     "Element",
+    "Event",
+    "EventTarget",
     "Node",
     "Window",
 ]
